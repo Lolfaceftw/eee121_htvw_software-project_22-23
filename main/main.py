@@ -4,29 +4,9 @@ import tkinter as tk
 # Tkinter used as interface
 import threading
 # Threading used for multithreading
+from lib.client import Client as client
 
-def get_free_port():
-    temp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    temp_socket.bind(("", 0))
-    free_port = temp_socket.getsockname()[1]
-    temp_socket.close()
-
-    ### This get_free_port() is used to get the port that is free for use.
-    ### Take note that if you want to print your port, dapat port-1, look sa may baba later.
-    return free_port
-
-def get_local_ip():
-    temp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    temp_socket.connect(("8.8.8.8", 80))
-    local_ip = temp_socket.getsockname()[0]
-    temp_socket.close()
-
-    ### DGRAM was used instead since connectionless siya. This is so that the sent dummy datagram is used to retrieve
-    ### the local IP assigned by the network to the device.
-
-    return local_ip
-
-def send_message():
+def send_message(event = None):
     message = message_entry.get()
     ### Message_entry.get() was used to retrieve what has been entered on the message box.
 
@@ -176,9 +156,9 @@ def display_peers():
 
 ### The code for below is to setup the Tkinter interface.
 window = tk.Tk()
-
-local_ip = get_local_ip()
-receive_port = get_free_port()
+window.bind('<Return>', send_message)
+local_ip = client.get_local_ip()
+receive_port = client.get_free_port()
 connected_peers = []
 
 message_label = tk.Label(window, text="Message:")
