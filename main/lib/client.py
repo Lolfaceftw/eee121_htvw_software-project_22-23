@@ -1,4 +1,6 @@
 import socket
+import threading
+import tkinter as tk
 
 class Client():
     def get_free_port():
