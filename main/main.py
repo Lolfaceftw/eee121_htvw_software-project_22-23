@@ -189,7 +189,6 @@ class ChatApp:
         while True:
             try:
                 data = conn.recv(4096)
-                ### This is to convert the received things to bytes. 4096 is the size.
                 if data:    
                     received_message = data.decode() ### Decoding of bytes
                     received_messages.append(received_message) ### Received message is then used to be printed into the message box
