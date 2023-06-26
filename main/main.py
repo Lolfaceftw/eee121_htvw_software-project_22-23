@@ -133,7 +133,16 @@ class ChatApp:
             error_message = f"Failed to send message: {str(e)}"
             message_box.insert(tk.END, error_message + "\n")
 
-    def receive_messages(self, conn, nickname):
+    def listen_thread(self):
+        listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        listen_socket.bind((self.receiver_ip, self.receiver_port))
+        listen_socket.listen(3)
+        
+        while True:
+            conn, address = listen_socket.accept()
+            receive_thread = threading.Thread(target=self.receive_messages, args=(conn, address))
+            receive_thread.start()
+    def receive_messages(self, conn, address, nickname = "Unknown"):
         while True:
             try:
                 data = conn.recv(4096)
@@ -141,12 +150,12 @@ class ChatApp:
                 if data:
                     received_message = data.decode() ### Decoding of bytes
                     received_messages.append(received_message) ### Received message is then used to be printed into the message box
-                    message_box.insert(tk.END, f"Message received from {nickname}: {received_message}\n")
+                    message_box.insert(tk.END, f"Message received from {address[0]}:{address[1]} ({nickname}): {received_message}\n")
                 else:
                     break
 
             except Exception as e:
-                error_message = f"Failed to receive message from {nickname}: {str(e)}"
+                error_message = f"Failed to receive message from {address[0]}:{address[1]} ({nickname}): {str(e)}"
                 message_box.insert(tk.END, error_message + "\n")
                 break
 
@@ -179,7 +188,8 @@ window.bind('<Return>', chat.send_message)
 local_ip = client.get_local_ip()
 receive_port = client.get_free_port()
 chat.receiver_port = receive_port
-print(receive_port)
+chat.receiver_ip = local_ip
+
 connected_peers = []
 
 message_label = tk.Label(window, text="Message:")
@@ -195,8 +205,11 @@ sent_messages = []
 
 message_box = tk.Text(window)
 message_box.pack()
-
+message_box.insert(tk.END, f"Your IP Address: {chat.receiver_ip}\n")
+message_box.insert(tk.END, f"Listening at Port {chat.receiver_port}\n")
 peers_box = tk.Text(window, height=6, width=30)
 peers_box.configure(state="disabled")
 
+listen_thread = threading.Thread(target=chat.listen_thread)
+listen_thread.start()
 window.mainloop()
