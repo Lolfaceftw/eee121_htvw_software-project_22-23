@@ -179,6 +179,7 @@ window = tk.Tk()
 
 local_ip = get_local_ip()
 receive_port = get_free_port()
+
 connected_peers = []
 
 message_label = tk.Label(window, text="Message:")
