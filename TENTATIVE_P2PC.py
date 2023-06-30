@@ -377,7 +377,7 @@ class Peer:
             except ValueError:
                 self.show_message(f'Incorrect usage of the command. Use /ping <nick>\n')
             except KeyError:
-                self.show_message(f"{receiver} is not found!")
+                self.show_message(f"{receiver} is not found!\n")
 
         elif msg_in.startswith("/help") or msg_in.startswith("/h"):
             try:
@@ -423,6 +423,15 @@ class Peer:
                     if not latency.isdigit(): raise TypeError
                     if receiver not in self.routing_table: raise KeyError
                     pair = (self.alias, receiver)
+                    for pairs in self.direct_connects:
+                        if pairs[0] == pair:
+                            self.show_message(f"You are already connected to {receiver}!\n")
+                            self.input_widget.delete('1.0', 'end')
+                            return "break"
+                    if self.alias == receiver:
+                        self.show_message(f"You can't connect to yourself!\n")
+                        self.input_widget.delete('1.0', 'end')
+                        return "break"
                     self.broadcast(f"connect {self.alias} {receiver} {latency}")
                     self.direct_connects = [x for x in self.direct_connects if x[0] != pair]                           
                     self.direct_connects.append((pair, latency))
