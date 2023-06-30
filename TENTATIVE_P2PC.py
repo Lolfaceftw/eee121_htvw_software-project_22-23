@@ -43,7 +43,6 @@ class Peer:
             #* Since there are unavailable peer-to-socket in self.peer_aliases, it is sent to all instead.
             #* And once sent to all, if the receiver is match, then it only displays the message.
             
-            #? This can be changed pa. 
             elif command == "priv_msg":
                 from_peer, receiver, msg = info.split(' ', 2)
                 for peersock in self.peer_aliases:
@@ -452,6 +451,8 @@ class Peer:
                     self.routing_table = {}
                     self.routing_table[self.alias] = (0,'none')
                     self.direct_connects = []
+                    self.peer_aliases = {}
+                    self.table = []
                     self.userlist_widget.configure(state='normal')
                     self.userlist_widget.delete('1.0', 'end')
                     self.userlist_widget.configure(state='disabled')
